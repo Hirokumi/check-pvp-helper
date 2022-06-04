@@ -35,6 +35,7 @@ local PopupList = {
    -- UnitPopupSharedMenus 9.2.5
    UnitPopupMenuFriend,
    UnitPopupMenuPlayer,
+   UnitPopupMenuEnemyPlayer,
    UnitPopupMenuParty,
    UnitPopupMenuRaid,
    UnitPopupMenuRaidPlayer,
