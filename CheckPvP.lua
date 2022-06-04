@@ -1,3 +1,4 @@
+UnitPopupButtons = { };
 UnitPopupButtons["ARMORY_LINK"] = { text = "Check PvP", dist = 0 }
 
 local frame = CreateFrame("Frame", "CheckPvPFrame", UIParent, "UIPanelDialogTemplate")
