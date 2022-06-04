@@ -1,98 +1,36 @@
---Localization Tables
-local L = {}
-if GetLocale() == "enUS" then
-	--@localization(locale="enUS", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "esMX" then
-	--@localization(locale="esMX", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "ptBR" then
-	--@localization(locale="ptBR", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "enGB" then
-	--@localization(locale="enUS", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "frFR" then
-	--@localization(locale="frFR", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "deDE" then
-	--@localization(locale="deDE", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "itIT" then
-	--@localization(locale="itIT", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "esES" then
-	--@localization(locale="esES", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "ruRU" then
-	--@localization(locale="ruRU", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "koKR" then
-	--@localization(locale="koKR", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "zhCN" then
-	--@localization(locale="zhCN", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-elseif GetLocale() == "zhTW" then
-	--@localization(locale="zhTW", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
-else
-	--No locale or error locale
-end
-if next(L) == nil then
-	--failsafe locale table
-	L = {
-		["Armory Link"] = "Armory Link",
-		["Okay"] = "Okay"
-	}
-end
+UnitPopupButtons["ARMORY_LINK"] = { text = "Check PvP", dist = 0 }
 
--- Create a new button type
-UnitPopupButtons["ARMORY_LINK"] = { text = "Armory Link", dist = 0 }
-
-local frame = CreateFrame("Frame", "ArmoryLinkFrame", UIParent, "UIPanelDialogTemplate")
+local frame = CreateFrame("Frame", "CheckPvPFrame", UIParent, "UIPanelDialogTemplate")
 local edit = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
-local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-
 frame.edit = edit
-frame.button = button
 
-local sitestable = {
-	--NA Region
-	["enUS"] = "https://worldofwarcraft.com/en-us/character/",
-	["esMX"] = "https://worldofwarcraft.com/es-mx/character/",
-	["ptBR"] = "https://worldofwarcraft.com/pt-br/character/",
-	--EU Region
-	["enGB"] = "https://worldofwarcraft.com/en-gb/character/",
-	["frFR"] = "https://worldofwarcraft.com/fr-fr/character/",
-	["deDE"] = "https://worldofwarcraft.com/de-de/character/",
-	["itIT"] = "https://worldofwarcraft.com/it-it/character/",
-	["esES"] = "https://worldofwarcraft.com/es-es/character/",
-	["ruRU"] = "https://worldofwarcraft.com/ru-ru/character/",
-	--Asian Regions
-	["koKR"] = "https://worldofwarcraft.com/ko-kr/character/",
-	["zhCN"] = "https://worldofwarcraft.com/zh-cn/character/", --Wrong site, blame censorship
-	["zhTW"] = "https://worldofwarcraft.com/zh-tw/character/",
-}
-local site = sitestable[GetLocale()] or "Error getting locale"
---All web addresses are in english - not sure if this is how it actually works in other locales (is there a mundodeguerra.com?)
 
 --Frame Setup
 frame:Hide()
-frame:SetHeight(100)
-frame:SetWidth(450)
+frame:SetHeight(80)
+frame:SetWidth(300)
 frame:SetPoint("CENTER", UIParent, "TOP", 0, -1 * GetScreenHeight() / 4)
 frame:EnableKeyboard(false)
-frame.Title:SetText(L["Armory Link"])
+frame.Title:SetText("Check PvP")
 frame:SetMovable(true)
 frame:SetScript("OnShow", function(self) self.edit:SetFocus() end)
 frame:SetScript("OnDragStart", function(self) self:StartMoving() end)
 frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 frame:RegisterForDrag("LeftButton")
 frame:EnableMouse(true)
+frame:SetToplevel(true)
 
 --Editbox Setup
-edit:SetPoint("TOPLEFT", frame, "LEFT", 30, 8)
-edit:SetPoint("BOTTOMRIGHT", frame, "RIGHT", -30, -8)
-edit:SetScript("OnEnterPressed", function(self) ArmoryLinkFrameClose:Click() end)
-edit:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
+edit:SetPoint("TOPLEFT", frame, "LEFT", 30, 0)
+edit:SetPoint("BOTTOMRIGHT", frame, "RIGHT", -30, -16)
+edit:SetScript("OnEnterPressed", function(self) self:GetParent():Hide() end)
+edit:SetScript("OnEscapePressed", function(self) self:GetParent():Hide() end)
+edit:SetScript("OnSpacePressed", function(self) self:GetParent():Hide() end)
+edit:SetScript("OnEditFocusLost", function(self) self:GetParent():Hide() end) -- Axtaroth edit, hides frame when Focus lost to avoid the frame from being active but text not automatically selecting
 edit:SetScript("OnEditFocusGained", function(self) self:HighlightText() end)
+edit:SetScript("OnUpdate", function(self) self:HighlightText() end)
+edit:SetJustifyH("CENTER")
 edit:SetAutoFocus(false)
-
---Button Setup
-button:SetPoint("BOTTOM", frame, "BOTTOM", 0, 10)
-button:SetHeight(20)
-button:SetWidth(50)
-button:SetText(L["Okay"])
-button:SetScript("OnClick", function() ArmoryLinkFrameClose:Click() end)
 
 -- Add it to the FRIEND, PLAYER, PARTY, RAID, RAID_PLAYER, and SELF menus as the 2nd to last option (before Cancel)
 -- place it as 3rd to last on self so that its before 'leave party'
@@ -104,22 +42,34 @@ table.insert(UnitPopupMenus["RAID_PLAYER"], #UnitPopupMenus["RAID_PLAYER"], "ARM
 table.insert(UnitPopupMenus["SELF"], #UnitPopupMenus["SELF"] - 2, "ARMORY_LINK")
 --Bnet friend menu handle is "BN_FRIEND"
 table.insert(UnitPopupMenus["BN_FRIEND"], #UnitPopupMenus["BN_FRIEND"], "ARMORY_LINK")
+table.insert(UnitPopupMenus["GUILD"], #UnitPopupMenus["GUILD"], "ARMORY_LINK")
+table.insert(UnitPopupMenus["GUILD_OFFLINE"], #UnitPopupMenus["GUILD_OFFLINE"], "ARMORY_LINK")
+table.insert(UnitPopupMenus["CHAT_ROSTER"], #UnitPopupMenus["CHAT_ROSTER"], "ARMORY_LINK")
+table.insert(UnitPopupMenus["TARGET"], #UnitPopupMenus["TARGET"], "ARMORY_LINK")
+table.insert(UnitPopupMenus["ARENAENEMY"], #UnitPopupMenus["ARENAENEMY"], "ARMORY_LINK")
+table.insert(UnitPopupMenus["FOCUS"], #UnitPopupMenus["FOCUS"], "ARMORY_LINK")
+table.insert(UnitPopupMenus["WORLD_STATE_SCORE"], #UnitPopupMenus["WORLD_STATE_SCORE"], "ARMORY_LINK")  
+table.insert(UnitPopupMenus["COMMUNITIES_GUILD_MEMBER"], #UnitPopupMenus["COMMUNITIES_GUILD_MEMBER"], "ARMORY_LINK")
+table.insert(UnitPopupMenus["COMMUNITIES_WOW_MEMBER"], #UnitPopupMenus["COMMUNITIES_WOW_MEMBER"], "ARMORY_LINK")
+
 
 -- Your function to setup your button
 function Armory_Link_Setup(level, value, dropDownFrame, anchorName, xOffset, yOffset, menuList, button, autoHideDelay)
+    tinsert(UISpecialFrames, "CheckPvPFrame") -- Axtaroth edit, makes frame truly closable with ESC
     -- Make sure we have what we need to continue
     if dropDownFrame and level then
-		local name, server, active
+		local name, server, active, customaction
 		if dropDownFrame.which == "BN_FRIEND" then
 			--bnet friend menu
 			if dropDownFrame.bnetIDAccount then
 				--get the gameaccount id and the game
-				local friendinfo = C_BattleNet.GetAccountInfoByID(dropDownFrame.bnetIDAccount);
-				local gameaccount = friendinfo.gameAccountInfo;
-				if gameaccount.clientProgram == BNET_CLIENT_WOW then
+				local gameaccount = C_BattleNet.GetAccountInfoByID(dropDownFrame.bnetIDAccount).gameAccountInfo.gameAccountID
+				local game = C_BattleNet.GetAccountInfoByID(dropDownFrame.bnetIDAccount).gameAccountInfo.clientProgram
+				if game == "WoW" then
+					local tmp=C_BattleNet.GetGameAccountInfoByID(gameaccount)
 					--if they are playing wow then get the character and server
-					name = gameaccount.characterName;
-					server = gameaccount.realmName;
+					name=tmp["characterName"] or ""
+					server=tmp["realmDisplayName"] or ""
 					active = true
 				else
 					--otherwise, disable. they are playing a different game
@@ -129,16 +79,25 @@ function Armory_Link_Setup(level, value, dropDownFrame, anchorName, xOffset, yOf
 		else
 			--other menu
 			if dropDownFrame.name then
-				name = dropDownFrame.name:lower()
-				server = dropDownFrame.server or GetRealmName()
+				name = dropDownFrame.name
+				if(dropDownFrame.server == nil or dropDownFrame.server == "") then
+					server = GetRealmName()
+				else
+					server = dropDownFrame.server
+				end
 				active = true
 			else
 				active = false
+				if(menuList) then
+					if(menuList[2] and menuList[2].arg1) then
+						customaction = true
+					end
+				end
 			end
 		end
 		--format servername
 		if server then 
-			server = server:gsub("'", "")
+			server = server
 			local ii = 0
 			while server:find("(%u%l+)(%u%l+)") do
 				server = server:gsub("(%u%l+)(%u%l+)", "%1 %2")
@@ -147,7 +106,7 @@ function Armory_Link_Setup(level, value, dropDownFrame, anchorName, xOffset, yOf
 					break
 				end
 			end
-			server = server:gsub("(%u%l+)(%d+)", "%1 %2"):gsub(" ", "-"):lower()
+			server = server:gsub("(%u%l+)(%d+)", "%1 %2")
 		end
 		-- Just so we don't have to concat strings for each interval
 		local buttonPrefix = "DropDownList" .. level .. "Button"
@@ -164,14 +123,23 @@ function Armory_Link_Setup(level, value, dropDownFrame, anchorName, xOffset, yOf
 					button.func = function()
 						-- Function for the button
 						--Set edit box
-						edit:SetText(site..server.."/"..name)
+						edit:SetText(name.."-"..server)
 						frame:Show()
 					end
 				else
 					button.func = function()
-						-- Function for the button
+                        -- Function for the button
+                        -- Phattyy edit to check if there's no "-", in which case it adds the Player's realm
+						if(customaction == true) then
+                            if not string.find(menuList[2].arg1, "-") then
+                              menuList[2].arg1 = menuList[2].arg1 .. '-' .. GetRealmName()
+                            end
+                            edit:SetText(menuList[2].arg1)
+                            frame:Show()
+                          else
 						--player not playing wow
-						print("Armory Link Menu: This player is not logged in to a character on WoW.")
+							print("Check-PvP: This player is not logged in to a character on WoW.")
+						end
 					end
 				end
 				-- Break the loop; we got what we were looking for.
@@ -182,8 +150,171 @@ function Armory_Link_Setup(level, value, dropDownFrame, anchorName, xOffset, yOf
 	end
 end
 
+
 -- Hook ToggleDropDownMenu with your function
 hooksecurefunc("ToggleDropDownMenu", Armory_Link_Setup);
 
 --Remove interact distance requirement
-UnitPopupButtons["ARMORY_LINK"].dist = nil
+UnitPopupButtons["ARMORY_LINK"].dist = nil;
+
+
+local LFG_LIST_SEARCH_ENTRY_MENU = {
+    {
+        text = nil, --Group name goes here
+        isTitle = true,
+        notCheckable = true,
+    },
+    {
+        text = WHISPER_LEADER,
+        func = function(_, name) ChatFrame_SendTell(name); end,
+        notCheckable = true,
+        arg1 = nil, --Leader name goes here
+        disabled = nil, --Disabled if we don't have a leader name yet or you haven't applied
+        tooltipWhileDisabled = 1,
+        tooltipOnButton = 1,
+        tooltipTitle = nil, --The title to display on mouseover
+        tooltipText = nil, --The text to display on mouseover
+    },
+	{
+        text = "Check PvP",
+		notCheckable = true,
+		arg1 = nil, --Player name goes here
+		disabled = nil, --Disabled if we don't have a name yet
+    },
+    {
+        text = LFG_LIST_REPORT_GROUP_FOR,
+        hasArrow = true,
+        notCheckable = true,
+        menuList = {
+            {
+                text = LFG_LIST_BAD_NAME,
+                func = function(_, id) C_LFGList.ReportSearchResult(id, "lfglistname"); end,
+                arg1 = nil, --Search result ID goes here
+                notCheckable = true,
+            },
+            {
+                text = LFG_LIST_BAD_DESCRIPTION,
+                func = function(_, id) C_LFGList.ReportSearchResult(id, "lfglistcomment"); end,
+                arg1 = nil, --Search reuslt ID goes here
+                notCheckable = true,
+                disabled = nil, --Disabled if the description is just an empty string
+            },
+            {
+                text = LFG_LIST_BAD_VOICE_CHAT_COMMENT,
+                func = function(_, id) C_LFGList.ReportSearchResult(id, "lfglistvoicechat"); end,
+                arg1 = nil, --Search reuslt ID goes here
+                notCheckable = true,
+                disabled = nil, --Disabled if the description is just an empty string
+            },
+            {
+                text = LFG_LIST_BAD_LEADER_NAME,
+                func = function(_, id) C_LFGList.ReportSearchResult(id, "badplayername"); end,
+                arg1 = nil, --Search reuslt ID goes here
+                notCheckable = true,
+                disabled = nil, --Disabled if we don't have a name for the leader
+            },
+        },
+    },
+    {
+        text = CANCEL,
+        notCheckable = true,
+    },
+};
+ 
+function LFGListUtil_GetSearchEntryMenu(resultID)
+
+	local results = C_LFGList.GetSearchResultInfo(resultID)
+	if not results then
+		return
+	end
+	local activityID = results.activityID
+	local leaderName = results.leaderName
+	
+    local _, appStatus, pendingStatus, appDuration = C_LFGList.GetApplicationInfo(resultID);
+    LFG_LIST_SEARCH_ENTRY_MENU[1].text = name;
+    LFG_LIST_SEARCH_ENTRY_MENU[2].arg1 = leaderName;
+    LFG_LIST_SEARCH_ENTRY_MENU[2].disabled = not leaderName;
+    LFG_LIST_SEARCH_ENTRY_MENU[3].arg1 = leaderName;
+    LFG_LIST_SEARCH_ENTRY_MENU[3].disabled = not leaderName;
+    LFG_LIST_SEARCH_ENTRY_MENU[4].menuList[1].arg1 = resultID;
+    LFG_LIST_SEARCH_ENTRY_MENU[4].menuList[2].arg1 = resultID;
+    LFG_LIST_SEARCH_ENTRY_MENU[4].menuList[2].disabled = (comment == "");
+    LFG_LIST_SEARCH_ENTRY_MENU[4].menuList[3].arg1 = resultID;
+    LFG_LIST_SEARCH_ENTRY_MENU[4].menuList[3].disabled = (voiceChat == "");
+    LFG_LIST_SEARCH_ENTRY_MENU[4].menuList[4].arg1 = resultID;
+    LFG_LIST_SEARCH_ENTRY_MENU[4].menuList[4].disabled = not leaderName;
+    return LFG_LIST_SEARCH_ENTRY_MENU;
+end
+
+local LFG_LIST_APPLICANT_MEMBER_MENU = {
+    {
+        text = nil, --Player name goes here
+        isTitle = true,
+        notCheckable = true,
+    },
+    {
+        text = WHISPER,
+        func = function(_, name) ChatFrame_SendTell(name); end,
+        notCheckable = true,
+        arg1 = nil, --Player name goes here
+        disabled = nil, --Disabled if we don't have a name yet
+    },
+    {
+        text = "Check PvP",
+		notCheckable = true,
+		arg1 = nil, --Player name goes here
+		disabled = nil, --Disabled if we don't have a name yet
+    },
+    {
+        text = LFG_LIST_REPORT_FOR,
+        hasArrow = true,
+        notCheckable = true,
+        menuList = {
+            {
+                text = LFG_LIST_BAD_PLAYER_NAME,
+                notCheckable = true,
+                func = function(_, id, memberIdx) C_LFGList.ReportApplicant(id, "badplayername", memberIdx); end,
+                arg1 = nil, --Applicant ID goes here
+                arg2 = nil, --Applicant Member index goes here
+            },
+            {
+                text = LFG_LIST_BAD_DESCRIPTION,
+                notCheckable = true,
+                func = function(_, id) C_LFGList.ReportApplicant(id, "lfglistappcomment"); end,
+                arg1 = nil, --Applicant ID goes here
+            },
+        },
+    },
+    {
+        text = IGNORE_PLAYER,
+        notCheckable = true,
+        func = function(_, name, applicantID) AddIgnore(name); C_LFGList.DeclineApplicant(applicantID); end,
+        arg1 = nil, --Player name goes here
+        arg2 = nil, --Applicant ID goes here
+        disabled = nil, --Disabled if we don't have a name yet
+    },
+    {
+        text = CANCEL,
+        notCheckable = true,
+    },
+};
+ 
+function LFGListUtil_GetApplicantMemberMenu(applicantID, memberIdx)
+    local name, class, localizedClass, level, itemLevel, tank, healer, damage, assignedRole = C_LFGList.GetApplicantMemberInfo(applicantID, memberIdx);
+	
+    --local id, status, pendingStatus, numMembers, isNew, comment = C_LFGList.GetApplicantInfo(applicantID);
+	
+    LFG_LIST_APPLICANT_MEMBER_MENU[1].text = name or " ";
+    LFG_LIST_APPLICANT_MEMBER_MENU[2].arg1 = name;
+    LFG_LIST_APPLICANT_MEMBER_MENU[2].disabled = not name;
+    LFG_LIST_APPLICANT_MEMBER_MENU[3].arg1 = name;
+    LFG_LIST_APPLICANT_MEMBER_MENU[3].disabled = not name;
+    LFG_LIST_APPLICANT_MEMBER_MENU[4].menuList[1].arg1 = applicantID;
+    LFG_LIST_APPLICANT_MEMBER_MENU[4].menuList[1].arg2 = memberIdx;
+    LFG_LIST_APPLICANT_MEMBER_MENU[4].menuList[2].arg1 = applicantID;
+    LFG_LIST_APPLICANT_MEMBER_MENU[4].menuList[2].disabled = (comment == "");
+    LFG_LIST_APPLICANT_MEMBER_MENU[5].arg1 = name;
+    LFG_LIST_APPLICANT_MEMBER_MENU[5].arg2 = applicantID;
+    LFG_LIST_APPLICANT_MEMBER_MENU[5].disabled = not name;
+    return LFG_LIST_APPLICANT_MEMBER_MENU;
+end

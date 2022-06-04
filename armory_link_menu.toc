@@ -1,12 +1,7 @@
-## Interface: 90001
-## Title: Armory Link Menu
-## Notes: Adds an armory link to the drop down menu.
-## Version: @project-version@
-## Author: Zendil-The Underbog
-##
-## X-Curse-Packaged-Version: @project-version@
-## X-Curse-Project-Name: armory_link_menu
-## X-Curse-Project-ID: armory_link_menu
-## X-Curse-Repository-ID: wow/armory_link_menu/mainline
+## Interface: 92000
+## Title: Check-PvP
+## Notes: Based on Armory Link Menu
+## Version: 1.4.0
+## Author: Zendil-The Underbog (modified by Hugofist)
 
 armory_link_menu.lua
