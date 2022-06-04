@@ -1,5 +1,3 @@
-UnitPopupButtons["ARMORY_LINK"] = { text = "Check PvP", dist = 0 }
-
 local frame = CreateFrame("Frame", "CheckPvPFrame", UIParent, "UIPanelDialogTemplate")
 local edit = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
 frame.edit = edit
@@ -32,25 +30,44 @@ edit:SetScript("OnUpdate", function(self) self:HighlightText() end)
 edit:SetJustifyH("CENTER")
 edit:SetAutoFocus(false)
 
--- Add it to the FRIEND, PLAYER, PARTY, RAID, RAID_PLAYER, and SELF menus as the 2nd to last option (before Cancel)
--- place it as 3rd to last on self so that its before 'leave party'
-table.insert(UnitPopupMenus["FRIEND"], #UnitPopupMenus["FRIEND"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["PLAYER"], #UnitPopupMenus["PLAYER"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["PARTY"], #UnitPopupMenus["PARTY"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["RAID"], #UnitPopupMenus["RAID"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["RAID_PLAYER"], #UnitPopupMenus["RAID_PLAYER"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["SELF"], #UnitPopupMenus["SELF"] - 2, "ARMORY_LINK")
---Bnet friend menu handle is "BN_FRIEND"
-table.insert(UnitPopupMenus["BN_FRIEND"], #UnitPopupMenus["BN_FRIEND"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["GUILD"], #UnitPopupMenus["GUILD"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["GUILD_OFFLINE"], #UnitPopupMenus["GUILD_OFFLINE"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["CHAT_ROSTER"], #UnitPopupMenus["CHAT_ROSTER"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["TARGET"], #UnitPopupMenus["TARGET"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["ARENAENEMY"], #UnitPopupMenus["ARENAENEMY"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["FOCUS"], #UnitPopupMenus["FOCUS"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["WORLD_STATE_SCORE"], #UnitPopupMenus["WORLD_STATE_SCORE"], "ARMORY_LINK")  
-table.insert(UnitPopupMenus["COMMUNITIES_GUILD_MEMBER"], #UnitPopupMenus["COMMUNITIES_GUILD_MEMBER"], "ARMORY_LINK")
-table.insert(UnitPopupMenus["COMMUNITIES_WOW_MEMBER"], #UnitPopupMenus["COMMUNITIES_WOW_MEMBER"], "ARMORY_LINK")
+-- Add it to the FRIEND, PLAYER, PARTY, RAID, RAID_PLAYER, and SELF menus
+local PopupList = {
+   -- UnitPopupSharedMenus 9.2.5
+   UnitPopupMenuFriend,
+   UnitPopupMenuPlayer,
+   UnitPopupMenuParty,
+   UnitPopupMenuRaid,
+   UnitPopupMenuRaidPlayer,
+   UnitPopupMenuSelf,
+   UnitPopupMenuBnFriend,
+   UnitPopupMenuGuild,
+   UnitPopupMenuGuildOffline,
+   UnitPopupMenuChatRoster,
+   UnitPopupMenuTarget,
+   UnitPopupMenuArenaEnemy,
+   UnitPopupMenuFocus,
+   UnitPopupMenuWorldStateScore,
+   UnitPopupMenuCommunitiesGuildMember,
+   UnitPopupMenuCommunitiesWowMember,
+}
+
+-- using mixin as blizzard recommended
+local CustomMenuButtonMixin = CreateFromMixins(UnitPopupButtonBaseMixin)
+function CustomMenuButtonMixin:GetInteractDistance() return nil end;
+function CustomMenuButtonMixin:GetText() return "Check PvP" end
+function CustomMenuButtonMixin:OnClick()
+   -- empty handler
+end
+
+-- extends every item in popup list, added custom button
+for i,v in ipairs(PopupList) do
+   local originButton = v.GetMenuButtons
+   function v:GetMenuButtons()
+      local buttons = originButton(self)
+      table.insert(buttons, 1, CustomMenuButtonMixin)
+      return buttons
+   end
+end
 
 
 -- Your function to setup your button
@@ -117,7 +134,7 @@ function Armory_Link_Setup(level, value, dropDownFrame, anchorName, xOffset, yOf
 			local button = _G[buttonPrefix..i]
 			if not button then break end
 			-- If the button is our button...
-			if button:GetText() == UnitPopupButtons["ARMORY_LINK"].text then
+			if button:GetText() == CustomMenuButtonMixin:GetText() then
 				if active == true then
 					-- Make it execute function for player that this menu popped up for (button at index 1)
 					button.func = function()
@@ -153,10 +170,6 @@ end
 
 -- Hook ToggleDropDownMenu with your function
 hooksecurefunc("ToggleDropDownMenu", Armory_Link_Setup);
-
---Remove interact distance requirement
-UnitPopupButtons["ARMORY_LINK"].dist = nil;
-
 
 local LFG_LIST_SEARCH_ENTRY_MENU = {
     {
