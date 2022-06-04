@@ -1,5 +1,0 @@
-license-output: LICENSE.md
-ignore:
-	- README.md
-	- LICENSE.md
-package-as: armory_link_menu
