@@ -38,7 +38,7 @@ end
 
 function CustomCheckPvPButtonMixin:OnClick(button)
     local name, realm = nil, nil
-
+    local clubID = CommunitiesFrame:GetSelectedClubId()
     if button.bnetIDAccount then
         -- Gestion des amis Battle.net
         local accountInfo = C_BattleNet.GetAccountInfoByID(button.bnetIDAccount)
@@ -52,17 +52,42 @@ function CustomCheckPvPButtonMixin:OnClick(button)
         name, realm = UnitName(unitId)
         realm = realm or GetRealmName()
     elseif button.name then
-        name = button.name
+        name = GetNameFromCommunity(clubID, button.name) or button.name
         realm = GetRealmName()
     end
 
     if name then
         local displayName = name .. "-" .. realm
-        edit:SetText(displayName)
+        if NameHasRealm(name) then
+            edit:SetText(name)
+        else 
+            edit:SetText(displayName)
+        end
     else
         edit:SetText("No valid player targeted")
     end
     frame:Show()
+end
+
+function GetNameFromCommunity(clubID, name)
+    if clubID then
+        local members = C_Club.GetClubMembers(clubID)
+        for _, member in ipairs(members) do
+            local info = C_Club.GetMemberInfo(clubID, member)
+            local characterName, realm = strsplit("-", info.name)
+            if name == characterName then
+                if NameHasRealm(info.name) then
+                    return info.name
+                else
+                    return name
+                end
+            end
+        end
+    end
+end
+
+function NameHasRealm(name)
+    return string.find(name, "-") ~= nil
 end
 
 local function AddCheckPvPButtonToMenu(popupMenu)
