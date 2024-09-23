@@ -1,3 +1,10 @@
+# 🆘 3 BUGS TO FIX !
+
+1. The realm is incorrect if it's different from the player's in the whispers in chat.
+2. The addon doesn't work on Community Tab
+3. The addon doesn't work in the in-game group finder tool. We used to be able to copy the group leader when browsing sign-ups and copy each character applying.
+
+
 ## About
 Adds a simple, copy-able link name and realm on all player drop down frames.
 
